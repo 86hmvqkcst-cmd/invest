@@ -23,6 +23,7 @@ const colors = {
     orange: "#f97316",
     amber: "#f59e0b",
     red: "#ef4444",
+    purple: "#a855f7",
   },
   dark: {
     text: "#f2f2f2",
@@ -48,6 +49,7 @@ const colors = {
     orange: "#fb923c",
     amber: "#fbbf24",
     red: "#f87171",
+    purple: "#c084fc",
   },
   radius: 16,
 };

@@ -178,8 +178,8 @@ export default function HomeScreen() {
               </View>
             )}
             {streak >= 30 && (
-              <View style={[styles.badge, { backgroundColor: '#a855f720', borderRadius: 99 }]}>
-                <Text style={[styles.badgeText, { color: '#a855f7' }]}>
+              <View style={[styles.badge, { backgroundColor: colors.purple + '20', borderRadius: 99 }]}>
+                <Text style={[styles.badgeText, { color: colors.purple }]}>
                   {locale === 'zh' ? '一个月' : '1 Month'}
                 </Text>
               </View>

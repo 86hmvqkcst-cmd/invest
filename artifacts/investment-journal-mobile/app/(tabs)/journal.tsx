@@ -13,20 +13,19 @@ import * as Haptics from 'expo-haptics'
 import { useColors } from '@/hooks/useColors'
 import { useRecords } from '@/context/RecordsContext'
 import { translations } from '@/lib/types'
-import type { Record, Emotion } from '@/lib/types'
+import type { Record as JournalRecord, Emotion } from '@/lib/types'
 import { Feather } from '@expo/vector-icons'
 
-const emotionAccents: Record<Emotion, string> = {
-  calm: '#60a5fa', stable: '#34d399', fomo: '#fb923c', greed: '#fbbf24', fear: '#f87171',
-}
-
 function RecordItem({ item, onDelete, locale, colors }: {
-  item: Record
+  item: JournalRecord
   onDelete: (id: string) => void
   locale: string
   colors: ReturnType<typeof useColors>
 }) {
   const t = translations[locale as 'zh' | 'en']
+  const emotionAccents: { [key in Emotion]: string } = {
+    calm: colors.blue, stable: colors.green, fomo: colors.orange, greed: colors.amber, fear: colors.red,
+  }
   const accentColor = emotionAccents[item.emotion]
   const emotionLabel = (t as Record<string, string>)[item.emotion] || item.emotion
 
