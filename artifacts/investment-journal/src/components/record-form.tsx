@@ -11,200 +11,190 @@ interface RecordFormProps {
   locale?: Locale
 }
 
-const emotionIcons: { [key in Emotion]: string } = {
-  calm: '○',
-  stable: '◇',
-  fomo: '△',
-  greed: '□',
-  fear: '▽',
+const emotionConfig: { [key in Emotion]: { icon: string; activeClass: string } } = {
+  calm:   { icon: '○', activeClass: 'border-blue-400/40 bg-blue-500/10 text-blue-400' },
+  stable: { icon: '◇', activeClass: 'border-emerald-400/40 bg-emerald-500/10 text-emerald-400' },
+  fomo:   { icon: '△', activeClass: 'border-orange-400/40 bg-orange-500/10 text-orange-400' },
+  greed:  { icon: '□', activeClass: 'border-amber-400/40 bg-amber-500/10 text-amber-400' },
+  fear:   { icon: '▽', activeClass: 'border-red-400/40 bg-red-500/10 text-red-400' },
 }
 
 export function RecordForm({ onSubmit, isDark = true, locale = 'zh' }: RecordFormProps) {
   const t = translations[locale]
-  
+  const [advanced, setAdvanced] = useState(false)
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
   const [asset, setAsset] = useState('')
   const [value, setValue] = useState('')
   const [emotion, setEmotion] = useState<Emotion>('stable')
   const [reason, setReason] = useState('')
-  const [isExpanded, setIsExpanded] = useState(false)
+  const [justSubmitted, setJustSubmitted] = useState(false)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!asset || !value) return
+    if (!value) return
 
     onSubmit({
       date,
-      asset,
+      asset: asset || '—',
       value: parseFloat(value),
       emotion,
       reason,
     })
 
-    setAsset('')
     setValue('')
+    setAsset('')
     setReason('')
     setEmotion('stable')
-    setIsExpanded(false)
+    setJustSubmitted(true)
+    setTimeout(() => setJustSubmitted(false), 1800)
   }
 
-  const getEmotionLabel = (em: Emotion) => {
-    return t[em as keyof typeof t] as string
-  }
-
-  const inputClass = isDark
-    ? 'w-full rounded-2xl border border-white/[0.06] bg-white/[0.03] px-4 py-3.5 text-sm text-white placeholder-white/25 backdrop-blur-sm transition-all duration-300 focus:border-white/20 focus:bg-white/[0.06] focus:outline-none focus:ring-1 focus:ring-white/10'
-    : 'w-full rounded-2xl border border-black/[0.08] bg-white/80 px-4 py-3.5 text-sm text-black placeholder-black/30 backdrop-blur-sm transition-all duration-300 focus:border-black/20 focus:bg-white focus:outline-none focus:ring-1 focus:ring-black/10'
+  const inputBase = isDark
+    ? 'w-full rounded-xl border border-white/[0.07] bg-white/[0.04] px-3.5 py-3 text-sm text-white placeholder-white/20 transition-all duration-200 focus:border-white/[0.18] focus:bg-white/[0.07] focus:outline-none'
+    : 'w-full rounded-xl border border-black/[0.08] bg-black/[0.03] px-3.5 py-3 text-sm text-black placeholder-black/25 transition-all duration-200 focus:border-black/[0.18] focus:bg-white focus:outline-none'
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className={`relative overflow-hidden rounded-3xl border p-6 backdrop-blur-2xl ${
-        isDark 
-          ? 'border-white/[0.06] bg-gradient-to-br from-white/[0.05] to-white/[0.02]' 
-          : 'border-black/[0.08] bg-white/70'
+      transition={{ duration: 0.55, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+      className={`relative overflow-hidden rounded-2xl border p-5 backdrop-blur-xl ${
+        isDark
+          ? 'border-white/[0.06] bg-gradient-to-br from-white/[0.05] to-white/[0.02]'
+          : 'border-black/[0.07] bg-white/70'
       }`}
     >
-      <div className={`absolute inset-0 ${
-        isDark 
-          ? 'bg-gradient-to-br from-blue-500/[0.03] via-transparent to-purple-500/[0.03]' 
-          : 'bg-gradient-to-br from-blue-500/[0.02] via-transparent to-purple-500/[0.02]'
-      }`} />
-      <div className="relative z-10">
-        <div className="mb-6 flex items-center justify-between">
-          <h3 className={`text-[11px] font-medium uppercase tracking-[0.2em] ${
-            isDark ? 'text-white/40' : 'text-black/40'
-          }`}>
-            {t.newRecord}
-          </h3>
-          <motion.button
-            type="button"
-            onClick={() => setIsExpanded(!isExpanded)}
-            whileTap={{ scale: 0.95 }}
-            className={`rounded-xl px-3 py-1.5 text-xs transition-colors ${
-              isDark 
-                ? 'text-white/40 hover:bg-white/[0.05] hover:text-white/60' 
-                : 'text-black/40 hover:bg-black/[0.05] hover:text-black/60'
-            }`}
-          >
-            {isExpanded ? (locale === 'zh' ? '收起' : 'Collapse') : (locale === 'zh' ? '展开' : 'Expand')}
-          </motion.button>
+      <div className="mb-5 flex items-center justify-between">
+        <h3 className={`text-[10px] font-medium uppercase tracking-[0.22em] ${
+          isDark ? 'text-white/35' : 'text-black/40'
+        }`}>{t.newRecord}</h3>
+        <button
+          type="button"
+          onClick={() => setAdvanced(!advanced)}
+          className={`rounded-lg px-2.5 py-1 text-[11px] transition-colors ${
+            isDark
+              ? 'text-white/30 hover:bg-white/[0.05] hover:text-white/50'
+              : 'text-black/35 hover:bg-black/[0.04] hover:text-black/55'
+          }`}
+        >
+          {advanced ? t.simpleMode : t.advancedMode}
+        </button>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Value — always visible, primary field */}
+        <div>
+          <label className={`mb-2 block text-[10px] font-medium uppercase tracking-widest ${
+            isDark ? 'text-white/30' : 'text-black/35'
+          }`}>{t.value}</label>
+          <input
+            type="number"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder={t.valuePlaceholder}
+            step="0.01"
+            autoComplete="off"
+            className={`${inputBase} text-base`}
+          />
         </div>
-        
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={`mb-2.5 block text-[11px] font-medium uppercase tracking-wider ${
-                isDark ? 'text-white/40' : 'text-black/40'
-              }`}>{t.date}</label>
-              <input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className={inputClass}
-              />
-            </div>
-            <div>
-              <label className={`mb-2.5 block text-[11px] font-medium uppercase tracking-wider ${
-                isDark ? 'text-white/40' : 'text-black/40'
-              }`}>{t.asset}</label>
-              <input
-                type="text"
-                value={asset}
-                onChange={(e) => setAsset(e.target.value)}
-                placeholder={t.assetPlaceholder}
-                className={inputClass}
-              />
-            </div>
-          </div>
 
-          <div>
-            <label className={`mb-2.5 block text-[11px] font-medium uppercase tracking-wider ${
-              isDark ? 'text-white/40' : 'text-black/40'
-            }`}>{t.value}</label>
-            <input
-              type="number"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              placeholder={t.valuePlaceholder}
-              step="0.01"
-              className={inputClass}
-            />
-          </div>
-
-          <div>
-            <label className={`mb-2.5 block text-[11px] font-medium uppercase tracking-wider ${
-              isDark ? 'text-white/40' : 'text-black/40'
-            }`}>{t.emotion}</label>
-            <div className="flex flex-wrap gap-2">
-              {emotions.map((em) => (
-                <motion.button
-                  key={em}
-                  type="button"
-                  onClick={() => setEmotion(em)}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className={`rounded-2xl border px-4 py-2.5 text-xs font-medium transition-all duration-300 ${
-                    emotion === em
-                      ? em === 'calm'
-                        ? 'border-blue-400/40 bg-blue-500/15 text-blue-400 shadow-lg shadow-blue-500/10'
-                        : em === 'stable'
-                          ? 'border-emerald-400/40 bg-emerald-500/15 text-emerald-400 shadow-lg shadow-emerald-500/10'
-                          : em === 'fomo'
-                            ? 'border-orange-400/40 bg-orange-500/15 text-orange-400 shadow-lg shadow-orange-500/10'
-                            : em === 'greed'
-                              ? 'border-amber-400/40 bg-amber-500/15 text-amber-400 shadow-lg shadow-amber-500/10'
-                              : 'border-red-400/40 bg-red-500/15 text-red-400 shadow-lg shadow-red-500/10'
-                      : isDark
-                        ? 'border-white/[0.06] bg-white/[0.02] text-white/40 hover:bg-white/[0.05] hover:text-white/60'
-                        : 'border-black/[0.08] bg-black/[0.02] text-black/40 hover:bg-black/[0.05] hover:text-black/60'
-                  }`}
-                >
-                  <span className="mr-1.5 opacity-60">{emotionIcons[em]}</span>
-                  {getEmotionLabel(em)}
-                </motion.button>
-              ))}
-            </div>
-          </div>
-
-          <AnimatePresence>
-            {(isExpanded || reason) && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
+        {/* Emotion row — always visible */}
+        <div>
+          <label className={`mb-2 block text-[10px] font-medium uppercase tracking-widest ${
+            isDark ? 'text-white/30' : 'text-black/35'
+          }`}>{t.emotion}</label>
+          <div className="flex gap-2">
+            {emotions.map((em) => (
+              <motion.button
+                key={em}
+                type="button"
+                onClick={() => setEmotion(em)}
+                whileTap={{ scale: 0.93 }}
+                className={`flex-1 rounded-xl border py-2.5 text-[11px] font-medium transition-all duration-200 ${
+                  emotion === em
+                    ? emotionConfig[em].activeClass
+                    : isDark
+                      ? 'border-white/[0.05] bg-white/[0.02] text-white/30 hover:bg-white/[0.05] hover:text-white/50'
+                      : 'border-black/[0.06] bg-transparent text-black/30 hover:bg-black/[0.04] hover:text-black/50'
+                }`}
               >
-                <label className={`mb-2.5 block text-[11px] font-medium uppercase tracking-wider ${
-                  isDark ? 'text-white/40' : 'text-black/40'
-                }`}>{t.reason}</label>
+                <span className="block text-center">{emotionConfig[em].icon}</span>
+                <span className="mt-0.5 block text-center text-[9px] tracking-wide">
+                  {t[em as keyof typeof t] as string}
+                </span>
+              </motion.button>
+            ))}
+          </div>
+        </div>
+
+        {/* Advanced fields */}
+        <AnimatePresence>
+          {advanced && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-4 overflow-hidden"
+            >
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className={`mb-2 block text-[10px] font-medium uppercase tracking-widest ${isDark ? 'text-white/30' : 'text-black/35'}`}>{t.date}</label>
+                  <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={inputBase} />
+                </div>
+                <div>
+                  <label className={`mb-2 block text-[10px] font-medium uppercase tracking-widest ${isDark ? 'text-white/30' : 'text-black/35'}`}>{t.asset}</label>
+                  <input type="text" value={asset} onChange={(e) => setAsset(e.target.value)} placeholder={t.assetPlaceholder} className={inputBase} />
+                </div>
+              </div>
+              <div>
+                <label className={`mb-2 block text-[10px] font-medium uppercase tracking-widest ${isDark ? 'text-white/30' : 'text-black/35'}`}>{t.reason}</label>
                 <textarea
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   placeholder={t.reasonPlaceholder}
-                  rows={4}
-                  className={`${inputClass} resize-none`}
+                  rows={3}
+                  className={`${inputBase} resize-none`}
                 />
-              </motion.div>
-            )}
-          </AnimatePresence>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-          <motion.button
-            type="submit"
-            whileHover={{ scale: 1.01, y: -1 }}
-            whileTap={{ scale: 0.99 }}
-            className={`w-full rounded-2xl py-4 text-sm font-semibold shadow-xl transition-all duration-300 ${
-              isDark 
-                ? 'bg-gradient-to-r from-white to-white/90 text-black shadow-white/10 hover:shadow-2xl hover:shadow-white/20' 
-                : 'bg-gradient-to-r from-black to-black/90 text-white shadow-black/10 hover:shadow-2xl hover:shadow-black/20'
-            }`}
-          >
-            {t.submit}
-          </motion.button>
-        </form>
-      </div>
+        {/* Submit */}
+        <AnimatePresence mode="wait">
+          {justSubmitted ? (
+            <motion.div
+              key="success"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className={`flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-medium ${
+                isDark ? 'bg-emerald-500/15 text-emerald-400' : 'bg-emerald-50 text-emerald-600'
+              }`}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              {locale === 'zh' ? '已记录' : 'Recorded'}
+            </motion.div>
+          ) : (
+            <motion.button
+              key="submit"
+              type="submit"
+              whileHover={{ scale: 1.005, y: -1 }}
+              whileTap={{ scale: 0.995 }}
+              className={`w-full rounded-xl py-3.5 text-sm font-medium transition-all duration-200 ${
+                isDark
+                  ? 'bg-white/90 text-black hover:bg-white'
+                  : 'bg-black/85 text-white hover:bg-black'
+              }`}
+            >
+              {t.submit}
+            </motion.button>
+          )}
+        </AnimatePresence>
+      </form>
     </motion.div>
   )
 }
