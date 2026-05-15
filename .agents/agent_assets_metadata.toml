@@ -6,3 +6,9 @@ id = "qv8fxcY81XnaXTYlIlOnS"
 uri = "file://investment-journal-source.tar.gz"
 type = "unspecified"
 title = "Investment Journal 完整源码"
+
+[[outputs]]
+id = "Dki0KHd53_Dlo8uv2QyAv"
+uri = "file://investment-journal-complete.zip"
+type = "unspecified"
+title = "Investment Journal 完整代码 (ZIP)"
