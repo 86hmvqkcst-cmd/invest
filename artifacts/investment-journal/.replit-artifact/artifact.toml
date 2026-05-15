@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Investment Journal"
+version = "1.0.0"
+id = "artifacts/investment-journal"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24450
+
+[services.development]
+run = "pnpm --filter @workspace/investment-journal run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/investment-journal", "run", "build" ]
+publicDir = "artifacts/investment-journal/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24450"
+BASE_PATH = "/"
